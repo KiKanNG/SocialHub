@@ -16,19 +16,100 @@ class FriendViewController: UITableViewController {
     // MARK: - Firebase data source
     var ref = FIRDatabase.database().reference()
     var userAllInfo:[UserInfoToPage] = []
-    var friend:String! = nil
+    
+    var friendID : String = ""
+    var friendName : String!
+    var myID = DefaultsInfo.FirebaseID
+    var myName : String!
+    
+    // Button
+    let Button = UIButton()
+    let items = UIBarButtonItem()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Button
+        Button.frame = CGRectMake(0, 0, 120, 30)
+        Button.setTitle("Add friend", forState: .Normal)
+
+        ObservingDBlist("friend_list", user: myID, target: friendID, buttonText: "Friends")
+        ObservingDBlist("pending_list", user: myID, target: friendID, buttonText: "Accept")
+        ObservingDBlist("pending_list", user: friendID, target: myID, buttonText: "Requested")
+
+        // Button.backgroundColor = UIColor.blackColor()
+        Button.setTitleColor(UIColor.purpleColor(), forState: .Normal)
+        Button.contentHorizontalAlignment = .Right
+        Button.addTarget(self, action: #selector(FriendViewController.action(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+        items.customView = Button
+        self.navigationItem.rightBarButtonItem = items
+        
         startObservingDB()
+        
+        ref.child("users_personal_info").child(myID).child("username").observeEventType(.Value, withBlock: { snapshot in
+            self.myName = snapshot.value as! String
+        })
+        
+        ref.child("users_personal_info").child(friendID).child("username").observeEventType(.Value, withBlock: { snapshot in
+            self.friendName = snapshot.value as! String
+        })
     }
     
-    @IBAction func BacktoFriendlist(sender: AnyObject) {
-        navigationController!.popViewControllerAnimated(true)
+    //action method :
+    
+    func action(sender:UIButton!) {
+        switch Button.titleLabel!.text {
+        case .Some("Add friend"):
+            // add to pending list
+            add2DB("pending_list", userID: myID, userName: myName, targetID: friendID)
+            
+        case .Some("Friends"):
+            print("sth")
+            // select from level of friends or unfriend
+            
+        case .Some("Accept"):
+            // add to both friend list
+            add2DB("friend_list", userID: myID, userName: myName, targetID: friendID)
+            add2DB("friend_list", userID: friendID, userName: friendName, targetID: myID)
+            // delete from pending list
+            deleteFromDB("pending_list", userID: myID, targetID: friendID)
+            
+        case .Some("Requested"):
+            // delete from pending list
+            deleteFromDB("pending_list", userID: friendID, targetID: myID)
+
+        default:
+            break
+        }
+    }
+    
+    func add2DB(listName: String, userID: String, userName: String, targetID: String) {
+        let info = [userID : ["username" : userName, "timestamp" : DefaultsInfo.timestamp]]
+        ref.child(listName).child(targetID).updateChildValues(info)
+    }
+    
+    func deleteFromDB(listName: String, userID: String, targetID: String) {
+        ref.child(listName).child(userID).child(targetID).removeValue()
+    }
+    
+    func ObservingDBlist(listName: String, user: String, target: String, buttonText: String) {
+        ref.child(listName).child(user).observeEventType(.Value, withBlock: { snapshot in
+            if snapshot.value is NSNull {
+                
+            } else {
+                for child in snapshot.children {
+                    if child.key == target {
+                        self.Button.setTitle(buttonText, forState: .Normal)
+                        self.tableView.reloadData()
+                    }
+                }
+            }
+        })
     }
     
     func startObservingDB() {
-        let dbRef = ref.child("users_personal_info").child(friend)
+        let dbRef = ref.child("users_personal_info").child(friendID)
         
         dbRef.observeEventType(.Value, withBlock: { snapshot in
             if snapshot.value is NSNull {
@@ -39,6 +120,11 @@ class FriendViewController: UITableViewController {
                 self.tableView!.reloadData()
             }
         })
+    }
+    
+    
+    @IBAction func BacktoFriendlist(sender: AnyObject) {
+        navigationController!.popViewControllerAnimated(true)
     }
     
     

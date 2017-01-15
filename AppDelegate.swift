@@ -23,7 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
-                
+        
         FIRAuth.auth()?.signInWithEmail("ngkikan@gmail.com", password: "123456", completion: { (user:FIRUser?, error:NSError?) in
             if error == nil {
 
@@ -31,6 +31,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 print(error?.description)
             }
         })
+        
+        self.window!.tintColor = UIColor.purpleColor()
         
         return true
     }

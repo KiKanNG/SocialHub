@@ -14,7 +14,7 @@ class FriendListViewController: UITableViewController {
     // MARK: - Firebase data source
     
     let ref = FIRDatabase.database().reference()
-    var friendlist = [String]()
+    var friendlist = [User]()
     
     // MARK: - System function
     override func viewDidLoad() {
@@ -25,7 +25,7 @@ class FriendListViewController: UITableViewController {
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         let upcoming:FriendViewController = segue.destinationViewController as! FriendViewController
         if let indexpath = self.tableView.indexPathForCell(sender as! UITableViewCell) {
-            upcoming.friend = friendlist[indexpath.row]
+            upcoming.friendID = friendlist[indexpath.row].uid
         }
     }
     
@@ -36,14 +36,28 @@ class FriendListViewController: UITableViewController {
             if snapshot.value is NSNull {
                 
             } else {
-                self.friendlist = [String]()
+                self.friendlist = [User]()
                 for child in snapshot.children {
-                    self.friendlist.append(child.key)
+                    var name : String = ""
+                    
+                    self.ref.child("users_personal_info").child(child.key).child("username").observeEventType(.Value, withBlock: { snapshot in
+                        name = snapshot.value as! String
+                        for friend in self.friendlist {
+                            if friend.uid == child.key {
+                                friend.username = name
+                                self.tableView!.reloadData()
+                            }
+                        }
+                    })
+
+                    self.friendlist.append(User.init(uid: child.key, username: name))
                 }
                 self.tableView!.reloadData()
             }
         })
+        
     }
+
     
     // MARK: - Table view data source
     
@@ -56,7 +70,7 @@ class FriendListViewController: UITableViewController {
         let cell = tableView.dequeueReusableCellWithIdentifier("Friend Cell", forIndexPath: indexPath) as UITableViewCell
         
         let friend = friendlist[indexPath.row]
-        cell.textLabel?.text = friend
+        cell.textLabel?.text = friend.username
         
         return cell
     }

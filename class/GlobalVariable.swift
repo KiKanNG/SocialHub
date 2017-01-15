@@ -16,17 +16,17 @@ struct DefaultsInfo {
     static let defaults = NSUserDefaults.standardUserDefaults()
     static let userID = "0001"
     static let FirebaseID = "c6wNkUZyBoe35svDVOjtjCywwAy1"
-    static var timestamp:String {
-        return "\(NSDate().timeIntervalSince1970 * 1000)"
+    static var timestamp:Double {
+        return NSDate().timeIntervalSince1970 * 1000
     }
     // static let FirebaseID = DefaultsInfo.defaults.stringForKey(DefaultsInfo.userID)
 }
 
 // MARK: - Class "User"
 class User {
-    let uid:String
-    let username:String
-    let email:String
+    var uid:String
+    var username:String
+    var email:String
     
     init (uid: String, username:String, email:String = "") {
         self.uid = uid

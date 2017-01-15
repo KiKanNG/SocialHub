@@ -43,9 +43,9 @@ class SearchViewController: UITableViewController {
         let upcoming:FriendViewController = segue.destinationViewController as! FriendViewController
         if let indexpath = self.tableView.indexPathForCell(sender as! UITableViewCell) {
             if searchController.active && searchController.searchBar.text != "" {
-                upcoming.friend = searchResult[indexpath.row].uid
+                upcoming.friendID = searchResult[indexpath.row].uid
             } else {
-                upcoming.friend = allUsers[indexpath.row].uid
+                upcoming.friendID = allUsers[indexpath.row].uid
             }
         }
     }
