@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  SocialHub
 //
-//  Created by KiKan Ng on 22/12/2016.
+//  Created by KiKan Ng on 22/12/2016
 //
 //
 
