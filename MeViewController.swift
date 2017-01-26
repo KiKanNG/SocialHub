@@ -19,7 +19,22 @@ class MeViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .Plain, target: self, action: #selector(handleLogout))
+        
         startObservingDB()
+    }
+    
+    func handleLogout() {
+        
+        do {
+            try FIRAuth.auth()?.signOut()
+        } catch let logoutError {
+            print(logoutError)
+        }
+        
+        let loginSubController = LoginSubViewController()
+        presentViewController(loginSubController, animated: true, completion: nil)
     }
  
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -30,7 +45,7 @@ class MeViewController: UITableViewController {
     }
     
     func startObservingDB() {
-        let dbRef = ref.child("users_personal_info").child(DefaultsInfo.FirebaseID)
+        let dbRef = ref.child("users_personal_info").child(DefaultsInfo.FirebaseID!)
         
         dbRef.observeEventType(.Value, withBlock: { snapshot in
             if snapshot.value is NSNull {

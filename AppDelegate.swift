@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  SocialHub
 //
-//  Created by KiKan Ng on 22/12/2016
+//  Created by KiKan Ng on 22/12/2016.
 //
 //
 
@@ -23,18 +23,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        login_logout()
         
-        FIRAuth.auth()?.signInWithEmail("ngkikan@gmail.com", password: "123456", completion: { (user:FIRUser?, error:NSError?) in
-            if error == nil {
-
-            } else {
-                print(error?.description)
-            }
-        })
+        // FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
         
         self.window!.tintColor = UIColor.purpleColor()
         
         return true
+    }
+    
+    func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
+        return FBSDKApplicationDelegate.sharedInstance().application(application, openURL: url, sourceApplication: sourceApplication, annotation: annotation)
+    }
+    
+    func login_logout() {
+        
+        var authenticatedUser:Bool = false
+        
+        if FIRAuth.auth()?.currentUser?.uid != nil {
+            authenticatedUser = true
+        }
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let loginT_RootController = storyboard.instantiateViewControllerWithIdentifier("start")
+        
+        if (authenticatedUser) {
+            self.window?.rootViewController = loginT_RootController
+        } else {
+            window = UIWindow(frame: UIScreen.mainScreen().bounds)
+            window?.makeKeyAndVisible()
+            window?.rootViewController = UINavigationController(rootViewController: LoginSubViewController())
+        }
     }
 
     func applicationWillResignActive(application: UIApplication) {
@@ -58,26 +77,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-/*
-    func applicationDidFinishLaunching(application: UIApplication) {
-        
-        var authenticatedUser:Bool = false
-        if (NSUserDefaults.standardUserDefaults().stringForKey("authLogin") != nil) {
-            authenticatedUser = true
-        }
-        
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let loginS_RootController = storyboard.instantiateViewControllerWithIdentifier("MyViewController")
-        let loginF_RootController = storyboard.instantiateViewControllerWithIdentifier("LoginViewController")
-        
-        if (authenticatedUser) {
-            self.window?.rootViewController = loginS_RootController
-        } else {
-            var rootController: UnsafeMutablePointer<UIViewController> = loginF_RootController
-        }
-        
-        
-    }
- */
+ 
 }
 

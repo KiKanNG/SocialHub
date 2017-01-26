@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum Friendly
+public enum friendliness
 {
     case Stranger
     case HiByeFriend
@@ -17,12 +17,11 @@ public enum Friendly
     case BFF
 }
 
-// Represents a generic product. Need an image named "default"
 class items
 {
     var title: String
     var description: String
-    var rating: Friendly
+    var rating: friendliness
     
     init(titled: String, description: String? = "")
     {

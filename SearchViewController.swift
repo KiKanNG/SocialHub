@@ -18,6 +18,7 @@ class SearchViewController: UITableViewController {
     let ref = FIRDatabase.database().reference()
     let maxQueryResult = 10
     
+    
     func filterContentForSearchText(searchText: String) {
         searchResult = allUsers.filter{users in
             return users.username.lowercaseString.containsString(searchText.lowercaseString)
@@ -62,7 +63,7 @@ class SearchViewController: UITableViewController {
                     let uid = child.key as String
                     if uid != DefaultsInfo.FirebaseID {
                         let name = child.value["username"] as? String
-                        self.allUsers.append(User.init(uid: uid, username: name!))
+                        self.allUsers.append(User.init(uid: uid, username: name!, friendly: 0))
                     }
 
                 }

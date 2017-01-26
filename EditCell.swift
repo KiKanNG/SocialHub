@@ -12,5 +12,6 @@ class EditCell: UITableViewCell {
 
     @IBOutlet var title: UILabel!
     @IBOutlet var infos: UITextField!
+    @IBOutlet var numberPic: UIImageView!
     
 }

@@ -14,8 +14,8 @@ import FirebaseDatabase
 // MARK: - Global Variable
 struct DefaultsInfo {
     static let defaults = NSUserDefaults.standardUserDefaults()
-    static let userID = "0001"
-    static let FirebaseID = "c6wNkUZyBoe35svDVOjtjCywwAy1"
+    static var FirebaseID = FIRAuth.auth()?.currentUser?.uid
+    static var FriendListData:Int = 5
     static var timestamp:Double {
         return NSDate().timeIntervalSince1970 * 1000
     }
@@ -26,23 +26,34 @@ struct DefaultsInfo {
 class User {
     var uid:String
     var username:String
-    var email:String
+    var friend:friendliness
     
-    init (uid: String, username:String, email:String = "") {
+    init (uid: String, username:String, friendly:Int = 0) {
         self.uid = uid
         self.username = username
-        self.email = email
+        
+        switch friendly {
+        case friendliness.HiByeFriend.hashValue:
+            self.friend = friendliness.HiByeFriend
+            
+        case friendliness.Friend.hashValue:
+            self.friend = friendliness.Friend
+            
+        case friendliness.BF.hashValue:
+            self.friend = friendliness.BF
+            
+        case friendliness.BFF.hashValue:
+            self.friend = friendliness.BFF
+            
+        default:
+            self.friend = friendliness.Stranger
+        }
     }
     
     init (userData:FIRUser) {
         uid = userData.uid
         username = userData.displayName!
-        
-        if let mail = userData.providerData.first?.email {
-            email = mail
-        } else {
-            email = ""
-        }
+        friend = friendliness.Stranger
     }
     
 }
@@ -82,7 +93,7 @@ class UserProfile {
     
     
     init (fromPage: [UserInfoToPage]) {
-        self.uid = DefaultsInfo.FirebaseID
+        self.uid = DefaultsInfo.FirebaseID!
         self.username = fromPage[0].infos[0]
         self.SocialAccounts_Facebook = fromPage[1].infos[0]
         self.SocialAccounts_Instagram = fromPage[1].infos[1]
